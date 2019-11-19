@@ -93,16 +93,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         Log.d("demo",list.toString());
-
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
         PolylineOptions polylineOptions = new PolylineOptions();
         for(int i=0;i<list.size();i++){
             double lat = Double.parseDouble(list.get(i).getLat());
             double longi = Double.parseDouble(list.get(i).getLongi());
             polylineOptions.add(new LatLng(lat,longi));
             mMap.addPolyline(polylineOptions);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,longi)));
-            mMap.setMinZoomPreference(10f);
+            if(i ==0 || i == list.size()-1)
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,longi)).title("I485 circle"));
+            builder.include(new LatLng(lat,longi));
+//            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,longi)));
+//            mMap.setMinZoomPreference(10f);
         }
+        final LatLngBounds bounds = builder.build();
+
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,30));
+            }
+        });
     }
 //
     public String loadJSONFromAsset(Context context) {
